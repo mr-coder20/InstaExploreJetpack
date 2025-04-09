@@ -1,6 +1,7 @@
 # InstaExploreJetpack 📸✨  
 > 📱 A modern **Instagram-like Explore screen** built with **Jetpack Compose**, animations, and real API data.  
-> 📱 رابط کاربری مدرن شبیه بخش **Explore اینستاگرام** با استفاده از **Jetpack Compose**، انیمیشن و داده‌های واقعی API.
+>📱 رابط کاربری مدرن شبیه بخش Explore اینستاگرام با استفاده از Jetpack Compose، انیمیشن و داده‌های واقعی API.
+
 
 ---
 
