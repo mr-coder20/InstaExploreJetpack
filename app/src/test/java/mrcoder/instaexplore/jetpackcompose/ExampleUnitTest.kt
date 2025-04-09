@@ -1,4 +1,4 @@
-package com.example.calculatexiaomi
+package mrcoder.instaexplore.jetpackcompose
 
 import org.junit.Test
 

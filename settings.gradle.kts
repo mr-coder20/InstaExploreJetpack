@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Calculate Xiaomi"
+rootProject.name = "Insta Explore"
 include(":app")
  

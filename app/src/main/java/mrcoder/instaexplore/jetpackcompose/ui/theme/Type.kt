@@ -1,4 +1,4 @@
-package com.example.calculatexiaomi.ui.theme
+package mrcoder.instaexplore.jetpackcompose.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

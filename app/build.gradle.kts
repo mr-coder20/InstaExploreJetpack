@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.calculatexiaomi"
+    namespace = "mrcoder.instaexplore.jetpackcompose"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.calculatexiaomi"
+        applicationId = "mrcoder.instaexplore.jetpackcompose"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
