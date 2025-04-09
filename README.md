@@ -31,9 +31,6 @@
 |--------------|--------------|
 | ![Preview 1](explore%20image%201.png) | ![Preview 2](explore%20image2.png) |
 
-🎞️ Demo Animation | انیمیشن نمایشی:
-
-> 🔗 [Click here to watch the demo (MP4)](explore%20gif.mp4)
 
 ---
 
