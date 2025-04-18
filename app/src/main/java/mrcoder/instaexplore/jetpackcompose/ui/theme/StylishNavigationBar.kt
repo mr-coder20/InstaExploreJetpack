@@ -15,7 +15,10 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,20 +41,25 @@ fun StylishNavigationBar(
         containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.85f),
         modifier = Modifier
             .height(56.dp)
-            .shadow(0.5f.dp, shape = RectangleShape)  // Add shadow to NavigationBar
-
+            .shadow(0.5f.dp, shape = RectangleShape) // Add shadow to NavigationBar
     ) {
         screens.forEach { screen ->
+            // بررسی اینکه آیا صفحه انتخاب شده است
             val selected = currentRoute == screen.route
             val interactionSource = remember { MutableInteractionSource() }
 
+            // آیتم نوار پایین
             NavigationBarItem(
                 selected = selected,
                 onClick = {
-                    // از popUpTo و launchSingleTop فقط در صورت نیاز استفاده کنید
-                    navController.navigate(screen.route) {
-                        // اگر نیاز به مدیریت مجدد پشته مسیرها ندارید، آن را حذف کنید
-                        launchSingleTop = true
+                    // جلوگیری از انتخاب دوباره همان صفحه
+                    if (currentRoute != screen.route) {
+                        navController.navigate(screen.route) {
+                            launchSingleTop = true  // جلوگیری از بارگذاری دوباره صفحه قبلی
+                            popUpTo(navController.graph.startDestinationRoute!!) {
+                                inclusive = false // صفحه قبلی حذف نمی‌شود
+                            }
+                        }
                     }
                 },
                 icon = {
@@ -62,16 +70,16 @@ fun StylishNavigationBar(
                             imageVector = screen.icon,
                             contentDescription = screen.label,
                             tint = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(if (selected) 28.dp else 24.dp)
+                            modifier = Modifier.size(if (selected) 28.dp else 24.dp)  // اندازه آیکون‌ها
                         )
                         if (selected) {
-                            Spacer(modifier = Modifier.height(2.dp))
+                            Spacer(modifier = Modifier.height(2.dp))  // فاصله زیر آیکون
                             Box(
                                 modifier = Modifier
                                     .height(3.dp)
                                     .width(20.dp)
-                                    .clip(RoundedCornerShape(50))
-                                    .background(MaterialTheme.colorScheme.onPrimary)
+                                    .clip(RoundedCornerShape(50)) // گوشه‌های گرد
+                                    .background(MaterialTheme.colorScheme.onPrimary)  // رنگ خط زیر آیکون
                             )
                         }
                     }
@@ -83,10 +91,9 @@ fun StylishNavigationBar(
                         color = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 },
-                alwaysShowLabel = false,
+                alwaysShowLabel = false, // نمایش برچسب فقط در هنگام انتخاب آیتم
                 interactionSource = interactionSource
             )
         }
     }
 }
-

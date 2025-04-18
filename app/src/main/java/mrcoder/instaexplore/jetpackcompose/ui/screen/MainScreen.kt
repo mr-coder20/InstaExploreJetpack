@@ -15,6 +15,7 @@ import mrcoder.instaexplore.jetpackcompose.ui.theme.StylishNavigationBar
 import mrcoder.instaexplore.jetpackcompose.viewmodel.NetworkStatusViewModel
 import mrcoder.instaexplore.jetpackcompose.viewmodel.PhotoViewModel
 
+// تعریف صفحات با خصوصیات route, label و icon
 sealed class Screen(val route: String, val label: String, val icon: ImageVector) {
     object Home : Screen("home", "Home", Icons.Filled.Home)
     object Explore : Screen("explore", "Explore", Icons.Filled.Search)
@@ -26,31 +27,39 @@ fun MainScreen(
     photoViewModel: PhotoViewModel,
     networkViewModel: NetworkStatusViewModel
 ) {
+    // ایجاد NavController برای مدیریت جابجایی صفحات
     val navController = rememberNavController()
+
+    // لیست صفحات
     val screens = listOf(Screen.Home, Screen.Explore, Screen.Profile)
 
+    // استفاده از Scaffold برای طراحی لایه‌بندی
     Scaffold(
         bottomBar = {
-            StylishNavigationBar(navController, screens)
+            StylishNavigationBar(
+                navController = navController, // ارسال NavController به نوار پایین
+                screens = screens
+            )
         }
     ) { innerPadding ->
+        // استفاده از NavHost برای مدیریت صفحات مختلف
         NavHost(
             navController = navController,
             startDestination = Screen.Home.route,
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(Screen.Home.route) {
-                HomeScreen(
+                HomeScreen() // صفحه خانگی
+            }
+            composable(Screen.Explore.route) {
+                ExploreScreen(
                     innerPadding = PaddingValues(0.dp),
                     photoViewModel = photoViewModel,
                     networkViewModel = networkViewModel
-                )
-            }
-            composable(Screen.Explore.route) {
-                ExploreScreen()
+                ) // صفحه جستجو
             }
             composable(Screen.Profile.route) {
-                ProfileScreen()
+                ProfileScreen() // صفحه پروفایل
             }
         }
     }
