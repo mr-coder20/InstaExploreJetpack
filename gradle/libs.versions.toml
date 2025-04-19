@@ -1,5 +1,6 @@
 [versions]
 accompanistFlowlayout = "0.31.1-alpha"
+accompanistSwiperefresh = "0.25.1"
 accompanistSystemuicontroller = "0.26.1-alpha"
 agp = "8.7.3"
 coilCompose = "2.2.2"
@@ -24,6 +25,7 @@ supportAnnotations = "28.0.0"
 
 [libraries]
 accompanist-flowlayout = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "accompanistFlowlayout" }
+accompanist-swiperefresh = { module = "com.google.accompanist:accompanist-swiperefresh", version.ref = "accompanistSwiperefresh" }
 accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistSystemuicontroller" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }

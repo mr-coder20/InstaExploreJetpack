@@ -72,5 +72,6 @@ dependencies {
     implementation(libs.converter.gson)
     implementation(libs.gson)
     implementation(libs.accompanist.flowlayout)
+    implementation (libs.accompanist.swiperefresh)
 
 }

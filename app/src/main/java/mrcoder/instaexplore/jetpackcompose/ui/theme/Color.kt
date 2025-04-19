@@ -8,8 +8,8 @@ import androidx.compose.ui.graphics.Color
 val PrimaryColor = Color(0xFFFFFFFF) // Your primary color
 val PrimaryVariantColor = Color(0xFFFFFFFF) // Your primary variant color
 val OnPrimaryColor = Color(0xFF000000) // Your color on primary
-val SecondaryColor = Color(0xFFFF7043) // Your secondary color
-val SecondaryVariantColor = Color(0xFFFF7043) // Your secondary variant color
+val SecondaryColor = Color(0xFF575757) // Your secondary color
+val SecondaryVariantColor = Color(0xFFFFFFFF) // Your secondary variant color
 val OnSecondaryColor = Color(0xFFFFFFFF) // Your color on secondary
 
 
