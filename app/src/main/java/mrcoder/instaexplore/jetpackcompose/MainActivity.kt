@@ -3,7 +3,9 @@ package mrcoder.instaexplore.jetpackcompose
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import mrcoder.instaexplore.jetpackcompose.data.AppContainer
@@ -17,6 +19,8 @@ import mrcoder.instaexplore.jetpackcompose.viewmodel.NetworkStatusViewModelFacto
 import mrcoder.instaexplore.jetpackcompose.viewmodel.PhotoViewModel
 import mrcoder.instaexplore.jetpackcompose.viewmodel.PhotoViewModelFactory
 import androidx.compose.ui.platform.LocalContext
+import com.google.accompanist.systemuicontroller.SystemUiController
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import mrcoder.instaexplore.jetpackcompose.ui.components.ErrorScreen
 
 class MainActivity : ComponentActivity() {
@@ -25,8 +29,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ExploreInstaTheme {
-                val context = LocalContext.current
 
+                val context = LocalContext.current
+                val systemUiController: SystemUiController = rememberSystemUiController()
+
+                // تغییر رنگ نوار وضعیت و نوار ناوبری
+                systemUiController.setSystemBarsColor(color = MaterialTheme.colorScheme.primary)
                 // ساخت PhotoViewModel با استفاده از Factory
                 val photoViewModel: PhotoViewModel = viewModel(
                     factory = PhotoViewModelFactory(AppContainer.photoRepository)
@@ -66,6 +74,7 @@ class MainActivity : ComponentActivity() {
                         MainScreen(
                             photoViewModel = photoViewModel,
                             networkViewModel = networkViewModel
+
                         )
                     }
                 }

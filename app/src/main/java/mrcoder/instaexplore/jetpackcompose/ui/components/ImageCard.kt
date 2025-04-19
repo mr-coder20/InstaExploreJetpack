@@ -19,7 +19,6 @@ import com.airbnb.lottie.compose.*
 import mrcoder.instaexplore.jetpackcompose.R
 import mrcoder.instaexplore.jetpackcompose.model.Photo
 
-
 @Composable
 fun ImageCard(photo: Photo, height: Dp, modifier: Modifier = Modifier) {
     val context = LocalContext.current
@@ -27,38 +26,37 @@ fun ImageCard(photo: Photo, height: Dp, modifier: Modifier = Modifier) {
 
     Card(
         modifier = modifier
-            .fillMaxWidth() // عرض کامل کارت
-            .height(height) // ارتفاع متغیر برای هر کارت
-            .padding(1.dp), // فاصله داخلی کارت
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp), // حذف سایه
+            .fillMaxWidth() // Full width for the card
+            .height(height) // Variable height for each card
+            .padding(1.dp), // Padding inside the card
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp), // Remove shadow
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        shape = RoundedCornerShape(1.dp) // گوشه‌ها صاف
-
+        shape = RoundedCornerShape(4.dp) // Slightly round corners
     ) {
         SubcomposeAsyncImage(
             model = ImageRequest.Builder(context)
                 .data(photo.url)
-                .crossfade(true)
-                .diskCachePolicy(CachePolicy.ENABLED)
-                .memoryCachePolicy(CachePolicy.ENABLED)
+                .crossfade(true) // Smooth transition
+                .diskCachePolicy(CachePolicy.ENABLED) // Enable disk cache
+                .memoryCachePolicy(CachePolicy.ENABLED) // Enable memory cache
                 .build(),
             contentDescription = "Loaded Image",
-            modifier = Modifier.fillMaxSize(), // پر کردن فضای کارت
-            contentScale = ContentScale.Crop, // مقیاس تصویر برای پر کردن کارت
+            modifier = Modifier.fillMaxSize(), // Fill the entire card space
+            contentScale = ContentScale.Crop, // Image scaling for filling the card
             loading = {
-                // انیمیشن Lottie به عنوان placeholder
+                // Show Lottie animation as placeholder during loading
                 LottieAnimation(
                     composition = composition,
-                    modifier = Modifier.fillMaxSize(), // انیمیشن تمام فضای کارت را پر می‌کند
-                    iterations = LottieConstants.IterateForever // انیمیشن به صورت بی‌پایان تکرار می‌شود
+                    modifier = Modifier.fillMaxSize(), // Animation fills the entire card
+                    iterations = LottieConstants.IterateForever // Infinite loop of animation
                 )
             },
             error = {
-                // انیمیشن Lottie در صورتی که خطا رخ دهد
+                // Show Lottie animation in case of an error
                 LottieAnimation(
                     composition = composition,
-                    modifier = Modifier.fillMaxSize(), // انیمیشن تمام فضای کارت را پر می‌کند
-                    iterations = LottieConstants.IterateForever // انیمیشن به صورت بی‌پایان تکرار می‌شود
+                    modifier = Modifier.fillMaxSize(), // Animation fills the entire card
+                    iterations = LottieConstants.IterateForever // Infinite loop of animation
                 )
             }
         )

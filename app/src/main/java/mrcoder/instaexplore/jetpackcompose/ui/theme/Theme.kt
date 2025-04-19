@@ -1,22 +1,11 @@
 package mrcoder.instaexplore.jetpackcompose.ui.theme
 
 import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.platform.LocalContext
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-
-private val DarkColorScheme = darkColorScheme(
-    primary = PrimaryColorDark,
-    primaryContainer = PrimaryVariantColorDark,
-    onPrimary = OnPrimaryColorDark,
-    secondary = SecondaryColorDark,
-    secondaryContainer = SecondaryVariantColorDark,
-    onSecondary = OnSecondaryColorDark,
-    background = PrimaryColorDark
-)
 
 private val LightColorScheme = lightColorScheme(
     primary = PrimaryColor,
@@ -30,29 +19,25 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun ExploreInstaTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
+    val colorScheme = if (dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val context = LocalContext.current
+        dynamicLightColorScheme(context)
+    } else {
+        LightColorScheme
     }
 
     val systemUiController = rememberSystemUiController()
-    val useDarkIcons = !darkTheme
+    val useDarkIcons = true  // since we're using light theme
 
     SideEffect {
         systemUiController.setSystemBarsColor(
-            color = if (darkTheme) PrimaryColorDark else PrimaryColor,
+            color = PrimaryColor,
             darkIcons = useDarkIcons
         )
-
     }
 
     MaterialTheme(

@@ -6,14 +6,16 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.SwipeRefreshState
+import com.google.accompanist.swiperefresh.SwipeRefreshIndicator
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import mrcoder.instaexplore.jetpackcompose.UiState
 import mrcoder.instaexplore.jetpackcompose.model.Photo
 import mrcoder.instaexplore.jetpackcompose.ui.components.ErrorScreen
@@ -31,40 +33,51 @@ fun ExploreScreen(
     val uiState by photoViewModel.uiState.collectAsState()
     val isConnected by networkViewModel.isConnected.collectAsState()
 
-    val lazyGridState = rememberLazyGridState()
+    val savedScrollIndex by photoViewModel.scrollIndex.collectAsState()
+    val savedScrollOffset by photoViewModel.scrollOffset.collectAsState()
 
-    // SwipeRefresh state
-    var isRefreshing by remember { mutableStateOf(false) }
+    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing = uiState is UiState.Loading)
 
-    // Fetch photos when there's internet
-    LaunchedEffect(isConnected) {
-        if (isConnected && uiState !is UiState.Success) {
-            photoViewModel.fetchPhotos() // Load photos if internet is available
+    val lazyGridState = rememberLazyGridState(
+        initialFirstVisibleItemIndex = savedScrollIndex,
+        initialFirstVisibleItemScrollOffset = savedScrollOffset
+    )
+
+    // Use derivedStateOf to create a stable value based on the firstVisibleItemIndex and scrollOffset
+    val derivedState = remember {
+        derivedStateOf {
+            Pair(
+                lazyGridState.firstVisibleItemIndex,
+                lazyGridState.firstVisibleItemScrollOffset
+            )
         }
     }
 
-    // Swipe to refresh
-    fun onRefresh() {
-        isRefreshing = true
-        photoViewModel.fetchPhotos() // Fetch photos again
-        isRefreshing = false
+    LaunchedEffect(isConnected) {
+        if (isConnected && uiState !is UiState.Success) {
+            photoViewModel.fetchPhotos()
+        }
     }
 
-    // Layout for the screen
+    // Track scroll state changes efficiently
+    LaunchedEffect(derivedState.value) {
+        photoViewModel.saveScrollState(
+            index = derivedState.value.first,
+            offset = derivedState.value.second
+        )
+    }
+
     Column(
         modifier = Modifier
             .padding(
                 start = innerPadding.calculateStartPadding(LocalLayoutDirection.current),
-                end = innerPadding.calculateEndPadding(LocalLayoutDirection.current),
-                top = 0.dp,
-                bottom = 0.dp
+                end = innerPadding.calculateEndPadding(LocalLayoutDirection.current)
             )
-            .background(color = Color.White)
+            .background(MaterialTheme.colorScheme.primary)
     ) {
-        // If there's no internet, show an error screen
         if (!isConnected) {
             ErrorScreen("No internet connection. Please check your network.") {
-                photoViewModel.fetchPhotos() // Retry loading photos
+                photoViewModel.fetchPhotos()
             }
         } else {
             val photos = (uiState as? UiState.Success<List<Photo>>)?.data?.distinctBy { it.url } ?: emptyList()
@@ -73,21 +86,27 @@ fun ExploreScreen(
                 when (uiState) {
                     is UiState.Loading -> LoadingScreen()
                     is UiState.Error -> ErrorScreen("Error loading photos. Please try again.") {
-                        photoViewModel.fetchPhotos() // Retry loading photos
+                        photoViewModel.fetchPhotos()
                     }
                     else -> {}
                 }
             } else {
                 val chunkedPhotos = photos.chunked(8)
 
+                // Correctly call SwipeRefresh within a Composable function
                 SwipeRefresh(
-                    state = SwipeRefreshState(isRefreshing),
-                    onRefresh = { onRefresh() },
+                    state = swipeRefreshState,
+                    onRefresh = { photoViewModel.onRefresh() },
                     indicator = { state, trigger ->
-                        // Custom refresh indicator
-                        if (state.isRefreshing) {
-                            CircularProgressIndicator(modifier = Modifier.size(40.dp))
-                        }
+                        SwipeRefreshIndicator(
+                            state = state,
+                            refreshTriggerDistance = trigger,
+                            contentColor = MaterialTheme.colorScheme.secondary,
+                            scale = true,
+                            backgroundColor = Color.White.copy(alpha = 0.6f),
+                            shape = CircleShape,
+                            modifier = Modifier.padding(16.dp)
+                        )
                     }
                 ) {
                     LazyVerticalGrid(
@@ -100,26 +119,19 @@ fun ExploreScreen(
                     ) {
                         itemsIndexed(chunkedPhotos) { index, chunk ->
                             when (chunk.size) {
-                                8 -> {
-                                    TripleColumnLayout(
-                                        photos = chunk,
-                                        uniquePhoto = chunk.last(),
-                                        isLeftAligned = index % 2 != 0,
-                                        index = index
-                                    )
-                                }
-                                else -> {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                    ) {
-                                        chunk.forEach { photo ->
-                                            ImageCard(
-                                                photo = photo,
-                                                height = 160.dp,
-                                                modifier = Modifier.weight(1f)
-                                            )
-                                        }
+                                8 -> TripleColumnLayout(
+                                    photos = chunk,
+                                    uniquePhoto = chunk.last(),
+                                    isLeftAligned = index % 2 != 0,
+                                    index = index
+                                )
+                                else -> Row(modifier = Modifier.fillMaxWidth()) {
+                                    chunk.forEach { photo ->
+                                        ImageCard(
+                                            photo = photo,
+                                            height = 160.dp,
+                                            modifier = Modifier.weight(1f)
+                                        )
                                     }
                                 }
                             }
@@ -130,6 +142,8 @@ fun ExploreScreen(
         }
     }
 }
+
+
 
 @Composable
 fun TripleColumnLayout(
@@ -147,11 +161,12 @@ fun TripleColumnLayout(
 
     Column(modifier = Modifier
         .fillMaxWidth()
-        .padding(1.dp)) {
+        .padding(1.dp)
+        .background(MaterialTheme.colorScheme.primary)
+    )
+    {
         if (index >= 2) {
-            Row(
-                modifier = Modifier.fillMaxWidth()
-            ) {
+            Row(modifier = Modifier.fillMaxWidth()) {
                 photos5To7.forEach { photo ->
                     ImageCard(photo = photo, height = 150.dp, modifier = Modifier.weight(1f))
                 }
@@ -172,9 +187,7 @@ fun TripleColumnLayout(
                     photos0To4[0] to photos0To4[1],
                     photos0To4[2] to photos0To4[3]
                 ).forEach { (photo1, photo2) ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
+                    Row(modifier = Modifier.fillMaxWidth()) {
                         ImageCard(photo = photo1, height = 120.dp, modifier = Modifier.weight(1f))
                         ImageCard(photo = photo2, height = 120.dp, modifier = Modifier.weight(1f))
                     }

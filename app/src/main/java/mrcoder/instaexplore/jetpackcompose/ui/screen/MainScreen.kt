@@ -1,16 +1,21 @@
 package mrcoder.instaexplore.jetpackcompose.ui.screen
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.*
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import mrcoder.instaexplore.jetpackcompose.ui.theme.StylishNavigationBar
 import mrcoder.instaexplore.jetpackcompose.viewmodel.NetworkStatusViewModel
 import mrcoder.instaexplore.jetpackcompose.viewmodel.PhotoViewModel
@@ -35,6 +40,9 @@ fun MainScreen(
 
     // استفاده از Scaffold برای طراحی لایه‌بندی
     Scaffold(
+        modifier = Modifier
+
+            .background(MaterialTheme.colorScheme.primary),
         bottomBar = {
             StylishNavigationBar(
                 navController = navController, // ارسال NavController به نوار پایین
@@ -46,7 +54,10 @@ fun MainScreen(
         NavHost(
             navController = navController,
             startDestination = Screen.Home.route,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier
+                .padding(innerPadding)
+                .background(MaterialTheme.colorScheme.primary)
+
         ) {
             composable(Screen.Home.route) {
                 HomeScreen() // صفحه خانگی

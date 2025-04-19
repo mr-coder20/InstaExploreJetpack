@@ -21,6 +21,7 @@ class AppStateViewModel(
         preloadApp()
     }
 
+
     private fun preloadApp() {
         viewModelScope.launch {
             try {
