@@ -1,6 +1,5 @@
 package mrcoder.instaexplore.jetpackcompose.viewmodel
 
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -8,11 +7,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import mrcoder.instaexplore.jetpackcompose.UiState
 
-
 class AppStateViewModel(
     private val photoViewModel: PhotoViewModel
 ) : ViewModel() {
-
     // استفاده از StateFlow برای مدیریت وضعیت
     private val _uiState = MutableStateFlow<UiState<Unit>>(UiState.Loading)
     val uiState: StateFlow<UiState<Unit>> = _uiState
@@ -20,7 +17,6 @@ class AppStateViewModel(
     init {
         preloadApp()
     }
-
 
     private fun preloadApp() {
         viewModelScope.launch {

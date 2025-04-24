@@ -15,6 +15,9 @@ class PhotoViewModel(private val photoRepository: PhotoRepository) : ViewModel()
     private val _uiState = MutableStateFlow<UiState<List<Photo>>>(UiState.Loading)
     val uiState: StateFlow<UiState<List<Photo>>> = _uiState
 
+    private val _isFetching = MutableStateFlow(false)
+    val isFetching: StateFlow<Boolean> = _isFetching
+
     // وضعیت اسکرول (برای نگهداری موقعیت اسکرول)
     private val _scrollIndex = MutableStateFlow(0)
     val scrollIndex: StateFlow<Int> = _scrollIndex
@@ -33,8 +36,11 @@ class PhotoViewModel(private val photoRepository: PhotoRepository) : ViewModel()
 
     // متد برای بارگذاری عکس‌ها
     fun fetchPhotos() {
+        if (_isFetching.value) return
+
         viewModelScope.launch {
-            _uiState.value = UiState.Loading // تنظیم وضعیت به در حال بارگذاری
+            _isFetching.value = true
+            //_uiState.value = UiState.Loading // تنظیم وضعیت به در حال بارگذاری
             try {
                 val newPhotos = photoRepository.fetchPhotos(currentOffset, limit)
                     .filterNot { it in allPhotos }
@@ -47,6 +53,9 @@ class PhotoViewModel(private val photoRepository: PhotoRepository) : ViewModel()
                 _uiState.value = UiState.Success(allPhotos) // وضعیت به موفقیت تغییر می‌کند
             } catch (e: Exception) {
                 _uiState.value = UiState.Error(e.localizedMessage ?: "Unknown Error") // اگر خطا بود وضعیت به خطا تغییر می‌کند
+            }
+            finally {
+                _isFetching.value = false
             }
         }
     }
