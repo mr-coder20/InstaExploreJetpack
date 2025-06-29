@@ -2,19 +2,9 @@ package mrcoder.instaexplore.jetpackcompose.ui.theme
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -29,73 +19,66 @@ import mrcoder.instaexplore.jetpackcompose.ui.screen.Screen
 fun StylishNavigationBar(
     navController: NavHostController,
     screens: List<Screen>
-
 ) {
-    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+    val currentBackStack = navController.currentBackStackEntryAsState()
+    val currentRoute = currentBackStack.value?.destination?.route
 
+    // استفاده از NavigationBar بدون متن
     NavigationBar(
-
-
         containerColor = MaterialTheme.colorScheme.primary,
+        tonalElevation = 6.dp,
         modifier = Modifier
-            .height(56.dp)
+            .fillMaxWidth()
+            .height(48.dp)
             .background(MaterialTheme.colorScheme.primary)
-            .padding(5.dp)
-
-
-        // Add shadow to NavigationBar
+            .padding(horizontal = 4.dp)
     ) {
         screens.forEach { screen ->
-            // بررسی اینکه آیا صفحه انتخاب شده است
-            val selected = currentRoute == screen.route
+            val isSelected = currentRoute == screen.route
             val interactionSource = remember { MutableInteractionSource() }
 
-            // آیتم نوار پایین
+            // نمایش فقط آیکون بدون متن
             NavigationBarItem(
-                selected = selected,
+                selected = isSelected,
                 onClick = {
-                    // جلوگیری از انتخاب دوباره همان صفحه
-                    if (currentRoute != screen.route) {
+                    if (!isSelected) {
                         navController.navigate(screen.route) {
-                            launchSingleTop = true  // جلوگیری از بارگذاری دوباره صفحه قبلی
+                            launchSingleTop = true
+                            restoreState = true
                             popUpTo(navController.graph.startDestinationRoute!!) {
-                                inclusive = false // صفحه قبلی حذف نمی‌شود
+                                saveState = true
+                                inclusive = false
                             }
                         }
                     }
                 },
                 icon = {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Icon(
                             imageVector = screen.icon,
                             contentDescription = screen.label,
-                            tint = if (selected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.secondary,
-                            modifier = Modifier.size(if (selected) 20.dp else 20.dp)  // اندازه آیکون‌ها
+                            tint = if (isSelected) MaterialTheme.colorScheme.secondary
+                            else MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.size(24.dp)
                         )
-                        if (selected) {
-                            Spacer(modifier = Modifier.height(2.dp))  // فاصله زیر آیکون
+                        if (isSelected) {
+                            Spacer(modifier = Modifier.height(4.dp))
                             Box(
                                 modifier = Modifier
                                     .height(3.dp)
                                     .width(20.dp)
-                                    .clip(RoundedCornerShape(50)) // گوشه‌های گرد
-                                    .background(MaterialTheme.colorScheme.secondary)  // رنگ خط زیر آیکون
+                                    .clip(RoundedCornerShape(50))
+                                    .background(MaterialTheme.colorScheme.secondary)
                             )
                         }
                     }
                 },
-                label = {
-                    Text(
-                        text = screen.label,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = if (selected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.secondary
-                    )
-                },
-                alwaysShowLabel = false, // نمایش برچسب فقط در هنگام انتخاب آیتم
+                label = { },
+                alwaysShowLabel = false,
                 interactionSource = interactionSource
             )
         }
     }
 }
+
+
