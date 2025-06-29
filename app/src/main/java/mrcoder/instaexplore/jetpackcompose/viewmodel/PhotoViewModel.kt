@@ -22,13 +22,16 @@ class PhotoViewModel(private val photoRepository: PhotoRepository) : ViewModel()
     private val _scrollOffset = MutableStateFlow(0)
     val scrollOffset: StateFlow<Int> = _scrollOffset
 
+    // متغیرهای مرتبط با وضعیت بارگذاری
     private var currentOffset = 0
-    private val limit = 500
+    private val limit = 50 // تعداد تصاویر هر بار بارگذاری
     private val allPhotos = mutableListOf<Photo>()
 
     // متد برای بارگذاری مجدد عکس‌ها
     fun onRefresh() {
-        fetchPhotos() // برای بارگذاری مجدد عکس‌ها از همین متد استفاده می‌کنیم
+        currentOffset = 0 // وضعیت اسکرول را از ابتدا قرار می‌دهیم
+        allPhotos.clear() // پاک کردن لیست تصاویر برای بارگذاری جدید
+        fetchPhotos() // بارگذاری مجدد تصاویر
     }
 
     // متد برای بارگذاری عکس‌ها
@@ -36,17 +39,18 @@ class PhotoViewModel(private val photoRepository: PhotoRepository) : ViewModel()
         viewModelScope.launch {
             _uiState.value = UiState.Loading // تنظیم وضعیت به در حال بارگذاری
             try {
+                // درخواست برای بارگذاری تصاویر جدید
                 val newPhotos = photoRepository.fetchPhotos(currentOffset, limit)
-                    .filterNot { it in allPhotos }
+                    .filterNot { it in allPhotos } // جلوگیری از اضافه کردن عکس‌های تکراری
 
                 if (newPhotos.isNotEmpty()) {
-                    allPhotos.addAll(newPhotos)
-                    currentOffset += newPhotos.size
+                    allPhotos.addAll(newPhotos) // افزودن عکس‌های جدید به لیست
+                    currentOffset += newPhotos.size // به‌روزرسانی موقعیت اسکرول
                 }
 
                 _uiState.value = UiState.Success(allPhotos) // وضعیت به موفقیت تغییر می‌کند
             } catch (e: Exception) {
-                _uiState.value = UiState.Error(e.localizedMessage ?: "Unknown Error") // اگر خطا بود وضعیت به خطا تغییر می‌کند
+                _uiState.value = UiState.Error(e.localizedMessage ?: "Unknown Error") // مدیریت خطا
             }
         }
     }

@@ -54,7 +54,7 @@ fun ExploreScreen(
     }
 
     LaunchedEffect(isConnected) {
-        if (isConnected && uiState !is UiState.Success) {
+        if (isConnected && uiState !is UiState.Success && uiState !is UiState.Loading) {
             photoViewModel.fetchPhotos()
         }
     }
@@ -91,7 +91,7 @@ fun ExploreScreen(
                     else -> {}
                 }
             } else {
-                val chunkedPhotos = photos.chunked(8)
+                val chunkedPhotos = remember(photos) { photos.chunked(8) }
 
                 // Correctly call SwipeRefresh within a Composable function
                 SwipeRefresh(
@@ -142,8 +142,6 @@ fun ExploreScreen(
         }
     }
 }
-
-
 
 @Composable
 fun TripleColumnLayout(
